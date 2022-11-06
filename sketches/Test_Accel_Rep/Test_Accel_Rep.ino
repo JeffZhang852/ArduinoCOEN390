@@ -17,7 +17,7 @@ void setup()
 {
   Serial.begin(115200);
 
-  // Initialize MPU6050
+  // Initializing MPU6050
   Serial.println("Initialize MPU6050");
   while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
@@ -106,7 +106,6 @@ void loop()
   count_check(normAccel.ZAxis - 9.8);
   delay(400);
 }
-
 
 //3 axis accel function
 //only count for linear (unidirection) rep
