@@ -74,41 +74,16 @@ void checkSettings(){
     case MPU6050_CLOCK_INTERNAL_8MHZ:  Serial.println("Internal 8MHz oscillator"); break;
   }
   
-  Serial.print(" * Gyroscope:         ");
+  Serial.println(" * Gyroscope:         ");
   switch(mpu.getScale()) {
     case MPU6050_SCALE_2000DPS:        Serial.println("2000 dps"); break;
     case MPU6050_SCALE_1000DPS:        Serial.println("1000 dps"); break;
     case MPU6050_SCALE_500DPS:         Serial.println("500 dps"); break;
     case MPU6050_SCALE_250DPS:         Serial.println("250 dps"); break;
   } 
-  
-//  Serial.print(" * Gyroscope offsets: ");
-//  Serial.print(mpu.getGyroOffsetX());
-//  Serial.print(" / ");
-//  Serial.print(mpu.getGyroOffsetY());
-//  Serial.print(" / ");
-//  Serial.println(mpu.getGyroOffsetZ());
-  
-  Serial.println();
 }
 
 void loop(){
-
-//  Serial.print(" Xraw = ");
-//  Serial.print(rawGyro.XAxis);
-//  Serial.print(" Yraw = ");
-//  Serial.print(rawGyro.YAxis);
-//  Serial.print(" Zraw = ");
-//  Serial.println(rawGyro.ZAxis);
-//
-//  Serial.print(" Xnorm = ");
-//  Serial.print(normGyro.XAxis);
-//  Serial.print(" Ynorm = ");
-//  Serial.print(normGyro.YAxis);
-//  Serial.print(" Znorm = ");
-//  Serial.print(normAccel.ZAxis);
-
-
 //  Serial.print("\t\tOffseted acceleration: ");
 //  Serial.println(getAccel() - a_Offset, 10);
 //  Serial.println(meanAvgAccel(), 10);
@@ -119,25 +94,26 @@ void loop(){
 //  Serial.print(accelZ);
   count_check(accelZ);
  
-//  delay(1);
+// delay(1);
 }
 
 // Returns the horizontal axis linear acceleration, respective to the z-axis of the accelerometer. 
 // The z-axis of the accelerometer is pointing downwards while performing data analysis in sprint 2.
 float getAccel() {
-//  Vector rawAccel = mpu.readRawAccel();
   Vector normAccel = mpu.readNormalizeAccel();
-  
-//  mpu.dmpGetQuaternion(&q, fifoBuffer);
-//  mpu.dmpGetAccel(&aa, fifoBuffer);
-//  mpu.dmpGetGravity(&gravity, &q);
-//  mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-//  return aaReal.z;
+
+  // Using the DMP. Won't use here.
+  //  mpu.dmpGetQuaternion(&q, fifoBuffer);
+  //  mpu.dmpGetAccel(&aa, fifoBuffer);
+  //  mpu.dmpGetGravity(&gravity, &q);
+  //  mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+  //  return aaReal.z;
 
   return normAccel.ZAxis;
 
 }
 
+// Returns the mean verage horizontal axis linear acceleration with noise smoothing.
 float meanAvgAccel() {
   SUM = SUM - READINGS[INDEX];            // Remove the oldest entry from the sum
   Vector normAccel = mpu.readNormalizeAccel();// Read the next sensor value
@@ -150,14 +126,24 @@ float meanAvgAccel() {
 
 //  Serial.print(VALUE - a_Offset);
 //  Serial.print(",");
-//  Serial.println(AVERAGED - a_Offset);
+  Serial.println(AVERAGED - a_Offset);
 
   return AVERAGED;
 //  delay(25); 
 }
 
+// Returns the gravitationnal acceleration fffset using averaging.
+// Used function because dependent on location of device.
+float accelOffset(int numbAvrgPts) {
+  float sum = 0;
+  for(int i = 0; i < numbAvrgPts; i++) {
+    sum = sum + mpu.readNormalizeAccel().ZAxis;
+  }
+  return sum/numbAvrgPts;
+}
+
 // Only count for linear rep.
-// Assuming Z axis control that direction
+// Assuming Z axis control that direction, and is pointing downwards.
 void count_check(float accelZ){
   Serial.print("\t\tAccel: ");
   Serial.print(accelZ, 10);
@@ -170,14 +156,4 @@ void count_check(float accelZ){
     start_pos = false;
     count++;
   }
-}
-
-// Offset the gravitational acceleration using averaging.
-// Used function because dependent on location of device.
-float accelOffset(int numbAvrgPts) {
-  float sum = 0;
-  for(int i = 0; i < numbAvrgPts; i++) {
-    sum = sum + mpu.readNormalizeAccel().ZAxis;
-  }
-  return sum/numbAvrgPts;
 }
