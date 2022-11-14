@@ -172,7 +172,11 @@ float meanAvgIntegration() {
 
 //  Serial.print(VALUE - a_Offset);
 //  Serial.print(",");
+<<<<<<< HEAD
   Serial.println(AVERAGED, 5);
+=======
+  Serial.println(AVERAGED - a_Offset);
+>>>>>>> d26e946c0a9a84b63d82edf5ad0d07a953745770
 
   float new_velocity = init_velocity + (((init_accel + AVERAGED) / 2) * (new_time - init_time));
   float new_position = init_position + (((init_velocity + new_velocity) / 2) * (new_time - init_time));
@@ -207,10 +211,15 @@ void count_check(float accelZ){
   Serial.println(count);
   
   if(accelZ < -3){
+<<<<<<< HEAD
     Serial.println(-3);
     start_pos = true;
   }else if(start_pos == true && accelZ > 3){
     Serial.println(3);
+=======
+    start_pos = true;
+  }else if(start_pos == true && accelZ > 3){
+>>>>>>> d26e946c0a9a84b63d82edf5ad0d07a953745770
     start_pos = false;
     count++;
   }
