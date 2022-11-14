@@ -33,8 +33,8 @@ float AVERAGED = 0;
 void setup(){
 
   //Bluetooth pin related
-  pinMode(echoPin, INPUT);
-  pinMode(triggerPin, OUTPUT);
+//  pinMode(echoPin, INPUT);
+//  pinMode(triggerPin, OUTPUT);
   //Transmission related
 //  Serial.begin(9600);
 //  MyBlue.begin(9600);
@@ -71,35 +71,36 @@ void setup(){
   mpu.setThreshold(3);
   
   // Check settings
-  checkSettings();
+//  checkSettings();
 }
 
-void checkSettings(){
-  Serial.println();
-  
-  Serial.print(" * Sleep Mode:        ");
-  Serial.println(mpu.getSleepEnabled() ? "Enabled" : "Disabled");
-  
-  Serial.print(" * Clock Source:      ");
-  switch(mpu.getClockSource())
-  {
-    case MPU6050_CLOCK_KEEP_RESET:     Serial.println("Stops the clock and keeps the timing generator in reset"); break;
-    case MPU6050_CLOCK_EXTERNAL_19MHZ: Serial.println("PLL with external 19.2MHz reference"); break;
-    case MPU6050_CLOCK_EXTERNAL_32KHZ: Serial.println("PLL with external 32.768kHz reference"); break;
-    case MPU6050_CLOCK_PLL_ZGYRO:      Serial.println("PLL with Z axis gyroscope reference"); break;
-    case MPU6050_CLOCK_PLL_YGYRO:      Serial.println("PLL with Y axis gyroscope reference"); break;
-    case MPU6050_CLOCK_PLL_XGYRO:      Serial.println("PLL with X axis gyroscope reference"); break;
-    case MPU6050_CLOCK_INTERNAL_8MHZ:  Serial.println("Internal 8MHz oscillator"); break;
-  }
-  
-  Serial.println(" * Gyroscope:         ");
-  switch(mpu.getScale()) {
-    case MPU6050_SCALE_2000DPS:        Serial.println("2000 dps"); break;
-    case MPU6050_SCALE_1000DPS:        Serial.println("1000 dps"); break;
-    case MPU6050_SCALE_500DPS:         Serial.println("500 dps"); break;
-    case MPU6050_SCALE_250DPS:         Serial.println("250 dps"); break;
-  } 
-}
+// Useless function for now.
+//void checkSettings(){
+//  Serial.println();
+//  
+//  Serial.print(" * Sleep Mode:        ");
+//  Serial.println(mpu.getSleepEnabled() ? "Enabled" : "Disabled");
+//  
+//  Serial.print(" * Clock Source:      ");
+//  switch(mpu.getClockSource())
+//  {
+//    case MPU6050_CLOCK_KEEP_RESET:     Serial.println("Stops the clock and keeps the timing generator in reset"); break;
+//    case MPU6050_CLOCK_EXTERNAL_19MHZ: Serial.println("PLL with external 19.2MHz reference"); break;
+//    case MPU6050_CLOCK_EXTERNAL_32KHZ: Serial.println("PLL with external 32.768kHz reference"); break;
+//    case MPU6050_CLOCK_PLL_ZGYRO:      Serial.println("PLL with Z axis gyroscope reference"); break;
+//    case MPU6050_CLOCK_PLL_YGYRO:      Serial.println("PLL with Y axis gyroscope reference"); break;
+//    case MPU6050_CLOCK_PLL_XGYRO:      Serial.println("PLL with X axis gyroscope reference"); break;
+//    case MPU6050_CLOCK_INTERNAL_8MHZ:  Serial.println("Internal 8MHz oscillator"); break;
+//  }
+//  
+//  Serial.println(" * Gyroscope:         ");
+//  switch(mpu.getScale()) {
+//    case MPU6050_SCALE_2000DPS:        Serial.println("2000 dps"); break;
+//    case MPU6050_SCALE_1000DPS:        Serial.println("1000 dps"); break;
+//    case MPU6050_SCALE_500DPS:         Serial.println("500 dps"); break;
+//    case MPU6050_SCALE_250DPS:         Serial.println("250 dps"); break;
+//  } 
+//}
 
 void loop(){
 //  Serial.print("\t\tOffseted acceleration: ");
@@ -107,7 +108,7 @@ void loop(){
 //  Serial.println(meanAvgAccel(), 10);
 
   // Offest positive, because accelerometer's z-axis is up-side down
-  float accelZ = meanAvgAccel() - a_Offset;
+  float accelZ = meanAvgAccel();
 
 //  Serial.print(accelZ);
   count_check(accelZ);
@@ -149,13 +150,7 @@ float meanAvgAccel() {
   SUM = SUM + VALUE;                      // Add the newest reading to the sum
   INDEX = (INDEX+1) % WINDOW_SIZE;        // Increment the index, and wrap to 0 if it exceeds the window size
 
-  AVERAGED = SUM / WINDOW_SIZE;      // Divide the sum of the window by the window size for the result
-
-//  Serial.print(VALUE - a_Offset);
-//  Serial.print(",");
-  Serial.println(AVERAGED - a_Offset);
-
-  return AVERAGED;
+  return (SUM / WINDOW_SIZE) - a_Offset;      // Divide the sum of the window by the window size for the result
 //  delay(25); 
 }
 
@@ -177,9 +172,9 @@ void count_check(float accelZ){
   Serial.print("\t\tRep count: ");
   Serial.println(count);
   
-  if(accelZ < -3){
+  if(accelZ < -2){
     start_pos = true;
-  }else if(start_pos == true && accelZ > 3){
+  }else if(start_pos == true && accelZ > 2){
     start_pos = false;
     count++;
   }
