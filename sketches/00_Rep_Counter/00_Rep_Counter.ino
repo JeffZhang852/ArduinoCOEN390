@@ -14,7 +14,7 @@ bool start_pos=false;
 int count = 0;
 float a_Offset;
 
-// For moving average noise filtering.
+// Variables for moving average noise filtering.
 #define WINDOW_SIZE 50
 int INDEX = 0;
 float VALUE = 0;
@@ -22,38 +22,45 @@ float SUM = 0;
 float READINGS[WINDOW_SIZE];
 float AVERAGED = 0;
 
+// Variables for integration.
+float init_accel;
+float init_velocity;
+float init_position;
+unsigned long init_time;
+
 
 void setup(){
   Serial.begin(115200);
 
   // Initializing MPU6050
   Serial.println("Initialize MPU6050");
-  // MPU6050_SCALE_2000DPS  :  data per second
-  // MPU6050_RANGE_2G       :  Accelerometer range in g's
   while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
     Serial.println("Could not find a valid MPU6050 sensor, check wiring!");
     delay(500);
   }
-  
-  // Gyroscope offsets:
-  // mpu.setGyroOffsetX(155);
-  // mpu.setGyroOffsetY(15);
-  // mpu.setGyroOffsetZ(15);
-  
-  // Calibrate gyroscope. The calibration must be at rest.
-  // If you don't want calibrate, comment this line.
-  mpu.calibrateGyro(); 
 
-  // Gravitationnal acceleration offset.
-  a_Offset = accelOffset(100);
-  
   // Set threshold sensivty. Default 3.
   // Whats this threshold?
   mpu.setThreshold(3);
   
+  // Gravitationnal acceleration offset.
+  a_Offset = accelOffset(100);
+
+  // Filling moving average buffer.
+  for(int i = 0; i < WINDOW_SIZE; i++) {
+    meanAvgAccel();
+  }
+  
+  
   // Check settings
   checkSettings();
+  
+  // These initial values should be respective to the weights being at rest.
+  init_accel = meanAvgAccel();
+  init_velocity = 0;
+  init_position = 0;
+  init_time = micros();
 }
 
 void checkSettings(){
@@ -74,70 +81,50 @@ void checkSettings(){
     case MPU6050_CLOCK_INTERNAL_8MHZ:  Serial.println("Internal 8MHz oscillator"); break;
   }
   
-  Serial.print(" * Gyroscope:         ");
+  Serial.println(" * Gyroscope:         ");
   switch(mpu.getScale()) {
     case MPU6050_SCALE_2000DPS:        Serial.println("2000 dps"); break;
     case MPU6050_SCALE_1000DPS:        Serial.println("1000 dps"); break;
     case MPU6050_SCALE_500DPS:         Serial.println("500 dps"); break;
     case MPU6050_SCALE_250DPS:         Serial.println("250 dps"); break;
   } 
-  
-//  Serial.print(" * Gyroscope offsets: ");
-//  Serial.print(mpu.getGyroOffsetX());
-//  Serial.print(" / ");
-//  Serial.print(mpu.getGyroOffsetY());
-//  Serial.print(" / ");
-//  Serial.println(mpu.getGyroOffsetZ());
-  
-  Serial.println();
 }
 
 void loop(){
-
-//  Serial.print(" Xraw = ");
-//  Serial.print(rawGyro.XAxis);
-//  Serial.print(" Yraw = ");
-//  Serial.print(rawGyro.YAxis);
-//  Serial.print(" Zraw = ");
-//  Serial.println(rawGyro.ZAxis);
-//
-//  Serial.print(" Xnorm = ");
-//  Serial.print(normGyro.XAxis);
-//  Serial.print(" Ynorm = ");
-//  Serial.print(normGyro.YAxis);
-//  Serial.print(" Znorm = ");
-//  Serial.print(normAccel.ZAxis);
-
-
 //  Serial.print("\t\tOffseted acceleration: ");
 //  Serial.println(getAccel() - a_Offset, 10);
 //  Serial.println(meanAvgAccel(), 10);
 
   // Offest positive, because accelerometer's z-axis is up-side down
-  float accelZ = meanAvgAccel() - a_Offset;
+  float accelZ = meanAvgAccel();
+  Serial.println(accelZ);
 
-//  Serial.print(accelZ);
-  count_check(accelZ);
+  // TODO.
+//  float posZ = doubleIntegration(accelZ);
+//  float velocityZ = meanAvgIntegration();
+
+//  count_check(accelZ);
  
-//  delay(1);
+// delay(1);
 }
 
 // Returns the horizontal axis linear acceleration, respective to the z-axis of the accelerometer. 
 // The z-axis of the accelerometer is pointing downwards while performing data analysis in sprint 2.
 float getAccel() {
-//  Vector rawAccel = mpu.readRawAccel();
   Vector normAccel = mpu.readNormalizeAccel();
-  
-//  mpu.dmpGetQuaternion(&q, fifoBuffer);
-//  mpu.dmpGetAccel(&aa, fifoBuffer);
-//  mpu.dmpGetGravity(&gravity, &q);
-//  mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
-//  return aaReal.z;
+
+  // Using the DMP. Won't use here.
+  //  mpu.dmpGetQuaternion(&q, fifoBuffer);
+  //  mpu.dmpGetAccel(&aa, fifoBuffer);
+  //  mpu.dmpGetGravity(&gravity, &q);
+  //  mpu.dmpGetLinearAccel(&aaReal, &aa, &gravity);
+  //  return aaReal.z;
 
   return normAccel.ZAxis;
 
 }
 
+// Returns the mean verage horizontal axis linear acceleration with noise smoothing.
 float meanAvgAccel() {
   SUM = SUM - READINGS[INDEX];            // Remove the oldest entry from the sum
   Vector normAccel = mpu.readNormalizeAccel();// Read the next sensor value
@@ -146,33 +133,62 @@ float meanAvgAccel() {
   SUM = SUM + VALUE;                      // Add the newest reading to the sum
   INDEX = (INDEX+1) % WINDOW_SIZE;        // Increment the index, and wrap to 0 if it exceeds the window size
 
-  AVERAGED = SUM / WINDOW_SIZE;      // Divide the sum of the window by the window size for the result
+  return (SUM / WINDOW_SIZE) - a_Offset;      // Divide the sum of the window by the window size for the result
+//  delay(25); 
+}
+
+// Double integration to get positon from acceleration. Must account for drift and error in averaging approximation.
+// TODO: Describe function
+float doubleIntegration(float new_accel) {
+  unsigned long new_time = micros();
+  // Code them together to reduce number of instruction, and therefore drift?
+  float new_velocity = init_velocity + (((init_accel + new_accel) / 2) * (new_time - init_time));
+  float new_position = init_position + (((init_velocity + new_velocity) / 2) * (new_time - init_time));
+//  Serial.println("Z-velocity: " + (String) (new_velocity));
+  Serial.println("Z-position: " + (String) (new_position));
+
+  float init_accel = new_accel;
+  float init_velocity = new_velocity;
+  float init_position = new_position;
+  float init_time = new_time;
+  
+  delay(10);
+  return new_velocity;  
+
+}
+
+
+// Using averaged integral values. (unfinished function)
+float meanAvgIntegration() {
+  unsigned long new_time = micros();
+  SUM = SUM - READINGS[INDEX];            // Remove the oldest entry from the sum
+  Vector normAccel = mpu.readNormalizeAccel();// Read the next sensor value
+  VALUE = normAccel.ZAxis;
+  READINGS[INDEX] = VALUE;                // Add the newest reading to the window
+  SUM = SUM + VALUE;                      // Add the newest reading to the sum
+  INDEX = (INDEX+1) % WINDOW_SIZE;        // Increment the index, and wrap to 0 if it exceeds the window size
+
+  AVERAGED = (SUM / WINDOW_SIZE) - a_Offset;      // Divide the sum of the window by the window size for the result
 
 //  Serial.print(VALUE - a_Offset);
 //  Serial.print(",");
-//  Serial.println(AVERAGED - a_Offset);
+  Serial.println(AVERAGED, 5);
 
+  float new_velocity = init_velocity + (((init_accel + AVERAGED) / 2) * (new_time - init_time));
+  float new_position = init_position + (((init_velocity + new_velocity) / 2) * (new_time - init_time));
+
+  float init_accel = AVERAGED;
+  float init_velocity = new_velocity;
+  float init_position = new_position;
+  float init_time = new_time;
+
+  Serial.println("Z-position: " + (String)(new_position));
+//  Serial.println("Z-position: " + (String) (new_position));
   return AVERAGED;
 //  delay(25); 
 }
 
-// Only count for linear rep.
-// Assuming Z axis control that direction
-void count_check(float accelZ){
-  Serial.print("\t\tAccel: ");
-  Serial.print(accelZ, 10);
-  Serial.print("\t\tRep count: ");
-  Serial.println(count);
-  
-  if(accelZ < -3){
-    start_pos = true;
-  }else if(start_pos == true && accelZ > 3){
-    start_pos = false;
-    count++;
-  }
-}
-
-// Offset the gravitational acceleration using averaging.
+// Returns the gravitationnal acceleration fffset using averaging.
 // Used function because dependent on location of device.
 float accelOffset(int numbAvrgPts) {
   float sum = 0;
@@ -180,4 +196,22 @@ float accelOffset(int numbAvrgPts) {
     sum = sum + mpu.readNormalizeAccel().ZAxis;
   }
   return sum/numbAvrgPts;
+}
+
+// Only count for linear rep.
+// Assuming Z axis control that direction, and is pointing downwards.
+void count_check(float accelZ){
+  Serial.print("\t\tAccel: ");
+  Serial.print(accelZ, 10);
+  Serial.print("\t\tRep count: ");
+  Serial.println(count);
+  
+  if(accelZ < -3){
+    Serial.println(-3);
+    start_pos = true;
+  }else if(start_pos == true && accelZ > 3){
+    Serial.println(3);
+    start_pos = false;
+    count++;
+  }
 }
