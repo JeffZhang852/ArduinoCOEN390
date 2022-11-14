@@ -172,9 +172,9 @@ void count_check(float accelZ){
   Serial.print("\t\tRep count: ");
   Serial.println(count);
   
-  if(accelZ < -2){
+  if(accelZ < -1){
     start_pos = true;
-  }else if(start_pos == true && accelZ > 2){
+  }else if(start_pos == true && accelZ > 1){
     start_pos = false;
     count++;
   }
