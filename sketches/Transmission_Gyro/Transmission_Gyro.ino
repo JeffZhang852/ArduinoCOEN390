@@ -6,12 +6,14 @@
     (c) 2014 by Korneliusz Jarzebski
 */
 
+// TODO: REFACTOR
+
 #include <Wire.h>
 #include <MPU6050.h>
 #include <SoftwareSerial.h>
 //Use this for custom transmission port
 //Default can be Tx/Rx but have issue while uploading, must unplug these pins
-SoftwareSerial MyBlue(10, 9); // RX | TX
+SoftwareSerial MyBlue(10, 9); // TX | RX
 String msg;
 
 int count_log = -1;
@@ -37,8 +39,8 @@ void setup(){
 //  pinMode(triggerPin, OUTPUT);
   //Transmission related
 //  Serial.begin(9600);
-//  MyBlue.begin(9600);
-  MyBlue.begin(115200);
+  MyBlue.begin(9600);
+//  MyBlue.begin(115200);
   Serial.println("Ready to connect\nDefualt password is 1234 or 000");
 
   
@@ -114,11 +116,10 @@ void loop(){
   count_check(accelZ);
 //  MyBlue.print("Z Accel: ");
 //  MyBlue.println(accelZ);//For Z info transmission
-  
 
-  if(count_log!= count){
-    MyBlue.print("Rep counter: ");//Keep this on for now to have clearer display.
-    MyBlue.println(count);
+  if(count_log != count){
+    MyBlue.println((String)count);
+    Serial.println((String)count);
     count_log=count;
   }
  
@@ -167,14 +168,14 @@ float accelOffset(int numbAvrgPts) {
 // Only count for linear rep.
 // Assuming Z axis control that direction, and is pointing downwards.
 void count_check(float accelZ){
-  Serial.print("\t\tAccel: ");
-  Serial.print(accelZ, 10);
-  Serial.print("\t\tRep count: ");
-  Serial.println(count);
+//  Serial.print("\t\tAccel: ");
+//  Serial.print(accelZ, 10);
+//  Serial.print("\t\tRep count: ");
+//  Serial.println(count);
   
-  if(accelZ < -1){
+  if(accelZ < -3){
     start_pos = true;
-  }else if(start_pos == true && accelZ > 1){
+  }else if(start_pos == true && accelZ > 3){
     start_pos = false;
     count++;
   }
