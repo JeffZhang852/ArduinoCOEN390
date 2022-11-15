@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     InitBTDataCommunication btInitDataComm =null;
 
     // For using only a boolean signal, and keeping track of the rep count in the app.
-//    int reps;
+    int reps;
 
     // Handles incoming Messages [BT state (1 & 2) + buffer data (only 2)] sent by the (1)BTConnection
     // thread & (2)InitBTDataCommunication thread, to be handled respectively.
@@ -100,11 +100,12 @@ public class MainActivity extends AppCompatActivity {
                     // Why transfer number of reps through buffer, when we can use only a boolean signal
                     //  and keep track of the rep count in the app?
                     byte[] readBuff = (byte[]) msg.obj;
-                    String reps = new String(readBuff,0,msg.arg1);
-                    repsDisplayTxtView.append(reps);
-//                    repsDisplayTxtView_V2.setText(reps);
-//                    reps++;
-//                    repsDisplayTxtView_V2.setText(String.valueOf(reps));
+                    String signal = new String(readBuff,0,msg.arg1);
+//                    repsDisplayTxtView.append(signal);
+                    if(signal.equals("T")) {
+                        reps++;
+                        repsDisplayTxtView_V2.setText(String.valueOf(reps));
+                    }
                     break;
             }
             return true;
@@ -117,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        reps = 0;
+        reps = 0;
 
         // Link UI components.
         repsDisplayTxtView = findViewById(R.id.repsDisplayTxtView);

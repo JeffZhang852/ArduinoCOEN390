@@ -117,11 +117,11 @@ void loop(){
 //  MyBlue.print("Z Accel: ");
 //  MyBlue.println(accelZ);//For Z info transmission
 
-  if(count_log != count){
-    MyBlue.println((String)count);
-    Serial.println((String)count);
-    count_log=count;
-  }
+//  if(count_log != count){
+//    MyBlue.println((String)count);
+//    Serial.println((String)count);
+//    count_log=count;
+//  }
  
 // delay(1);
 }
@@ -178,5 +178,9 @@ void count_check(float accelZ){
   }else if(start_pos == true && accelZ > 3){
     start_pos = false;
     count++;
+//    MyBlue.println("Reps: " + (String) count);
+//    Serial.println("Reps: " + (String) count);
+    MyBlue.println("T");
+    Serial.println("T");
   }
 }
