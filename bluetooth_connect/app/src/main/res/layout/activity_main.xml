@@ -23,11 +23,10 @@
             android:layout_weight=".6">
 
             <Spinner
-                android:id="@+id/idMASpinnerBTPairedDevices"
+                android:id="@+id/btPairedDevicesSpinner"
                 android:layout_width="match_parent"
                 android:background="@color/white"
                 android:layout_height="match_parent">
-
             </Spinner>
 
         </LinearLayout>

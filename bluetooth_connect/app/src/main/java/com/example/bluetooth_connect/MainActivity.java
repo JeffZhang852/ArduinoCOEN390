@@ -123,7 +123,7 @@ public class MainActivity extends AppCompatActivity {
         // Link UI components.
         repsDisplayTxtView = findViewById(R.id.repsDisplayTxtView);
         repsDisplayTxtView.setMovementMethod(new ScrollingMovementMethod());
-        spinnerBTPairedDevices = findViewById(R.id.idMASpinnerBTPairedDevices);
+        spinnerBTPairedDevices = findViewById(R.id.btPairedDevicesSpinner);
         btConnectButton = findViewById(R.id.btConnectButton);
         repsDisplayTxtView.setText("App Loaded");
         repsDisplayTxtView_V2 = findViewById(R.id.repsDisplayTxtView_V2);

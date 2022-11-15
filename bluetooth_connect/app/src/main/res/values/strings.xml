@@ -1,3 +1,86 @@
 <resources>
-    <string name="app_name">bluetooth_connect</string>
+    <string name="app_name">390_RepCounter</string>
+    <string name="new_goals_menu">New Goal</string>
+    <string name="goals_menu">Current Goals</string>
+
+    //List of exercises for dropdown
+    <string-array name="ExerciseList">
+        <item>+ Add Exercise</item>
+        <item>Assisted Chin Ups</item>
+        <item>Assisted Dips</item>
+        <item>Assisted Pull Ups</item>
+        <item>Bent Over Cable Rear Deltoid Raise</item>
+        <item>Cable Calf Raises</item>
+        <item>Cable Chest Fly</item>
+        <item>Cable Chest Press</item>
+        <item>Cable Crunch</item>
+        <item>Cable Curl</item>
+        <item>Cable Hip Abduction</item>
+        <item>Cable Hip Extension</item>
+        <item>Cable Incline Tricep Extension</item>
+        <item>Cable Lateral Raise</item>
+        <item>Cable Overhead Tricep Extension</item>
+        <item>Cable Preacher Curl</item>
+        <item>Cable Rear Deltoid Fly</item>
+        <item>Cable Reverse Crunch</item>
+        <item>Cable Romanian Deadlift</item>
+        <item>Cable Russian Twists</item>
+        <item>Cable Shoulder Press</item>
+        <item>Cable Shrug</item>
+        <item>Cable Skullcrushers</item>
+        <item>Cable Squat</item>
+        <item>Cable Tricep Extension</item>
+        <item>Cable Tricep Kickback</item>
+        <item>Cable Wrist Curl</item>
+        <item>Calf Raises</item>
+        <item>Chest Fly</item>
+        <item>Chest Press</item>
+        <item>Chest Supported Row</item>
+        <item>Decline Chest Fly</item>
+        <item>Declined Cable Chest Fly</item>
+        <item>Declined Cable Chest Press</item>
+        <item>Declined Chest Press</item>
+        <item>Face Pull</item>
+        <item>Front Cable Raise</item>
+        <item>Glute Kickback</item>
+        <item>Glute Pull Through</item>
+        <item>Hammer Curl</item>
+        <item>High-Pulley Side Bends</item>
+        <item>Hip Abductor </item>
+        <item>Hip Adductor</item>
+        <item>Incline Cable Curl</item>
+        <item>Incline Chest Fly</item>
+        <item>Incline Chest Press</item>
+        <item>Inclined Cable Chest Fly</item>
+        <item>Inclined Cable Chest Press</item>
+        <item>Kneeling Cable Crunch</item>
+        <item>Kneeling Oblique Cable Twists</item>
+        <item>Lat Pulldown</item>
+        <item>Lateral Raise</item>
+        <item>Leg Curl</item>
+        <item>Leg extension</item>
+        <item>Low-Pulley Side Bends</item>
+        <item>Lying Cable Curl</item>
+        <item>Machine Bicep Curl</item>
+        <item>Machine Preacher Curl</item>
+        <item>Overhead Cable Curl</item>
+        <item>Rear Deltoid Fly</item>
+        <item>Reverse Cable Curl</item>
+        <item>Reverse Grip Tricep Extentions</item>
+        <item>Seated Cable Curl</item>
+        <item>Seated Cable Row</item>
+        <item>Seated Leg Press</item>
+        <item>Shoulder Press</item>
+        <item>Standing Cable Crunch</item>
+        <item>Standing Cable Row</item>
+        <item>Standing Leg Curl</item>
+        <item>Straight Arm Pulldown</item>
+        <item>Upright Cable Row</item>
+    </string-array>
+
+    <string-array name="goal_display_list">
+        <item>All</item>
+        <item>Complete</item>
+        <item>Incomplete</item>
+    </string-array>
 </resources>
