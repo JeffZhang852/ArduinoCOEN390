@@ -85,5 +85,6 @@ void count_check(float accelZ){
     start_pos = false;
     count++;
     MyBlue.println("T");
+    Serial.print((String)count);
   }
 }
