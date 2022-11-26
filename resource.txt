@@ -1,0 +1,2 @@
+https://docs.arduino.cc/hardware/nano-33-ble
+https://www.okdo.com/getting-started/get-started-with-arduino-nano-33-ble/
