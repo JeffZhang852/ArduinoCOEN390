@@ -3,8 +3,11 @@
 #include <SoftwareSerial.h>
 //Use this for custom transmission port
 //Default can be Tx/Rx but have issue while uploading, must unplug these pins
-SoftwareSerial MyBlue(10, 9); // TX | RX
+SoftwareSerial MyBlue(2, 3); // TX | RX
 String msg;//Transmission buffer
+
+// SCL: A5 (bluno) 
+// SDA: A4(bluno)
 int count_log = -1;//Trigger lock
 
 //Gyroscope initialization
@@ -24,11 +27,11 @@ float AVERAGED = 0;
 
 void setup(){
   //Bluetooth setup baudrate
-  MyBlue.begin(115200);
-  Serial.println("Ready to connect\nDefualt password is 1234 or 000");
+  MyBlue.begin(9600);
+  Serial.println("Ready to connect\nDefualt password is 1234 or 000"); 
 
   // Initializing MPU6050
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Initialize MPU6050");
   while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
@@ -77,7 +80,6 @@ float accelOffset(int numbAvrgPts) {
 }
 
 // Only count for linear rep.
-// Assuming Z axis control that direction, and is pointing downwards.
 void count_check(float accelZ){
   if(accelZ < -3){
     start_pos = true;
@@ -85,6 +87,6 @@ void count_check(float accelZ){
     start_pos = false;
     count++;
     MyBlue.println("T");
-    Serial.print((String)count);
+    Serial.println((String)count + "T");
   }
 }
