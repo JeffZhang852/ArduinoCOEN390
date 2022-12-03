@@ -10,7 +10,7 @@
 #include <SoftwareSerial.h>
 //Use this for custom transmission port
 //Default can be Tx/Rx but have issue while uploading, must unplug these pins
-SoftwareSerial MyBlue(10, 9); // TX | RX
+SoftwareSerial MyBlue(2, 3); // TX | RX
 String msg;//Transmission buffer
 int count_log = -1;//Trigger lock
 
@@ -18,7 +18,7 @@ int count_log = -1;//Trigger lock
 double startTime=0, endTime=0;
 bool checkTrigger = false;
 bool countDetect = false;
-int timeoutNumber = 7;//Means in 7 seconds, it calls timeout
+int timeoutNumber = 10;//Means in 5 seconds, it calls timeout
 
 //Gyroscope initialization
 MPU6050 mpu;
@@ -41,7 +41,7 @@ void setup(){
   Serial.println("Ready to connect\nDefualt password is 1234 or 000");
 
   // Initializing MPU6050
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("Initialize MPU6050");
   while(!mpu.begin(MPU6050_SCALE_2000DPS, MPU6050_RANGE_2G))
   {
@@ -94,13 +94,13 @@ float accelOffset(int numbAvrgPts) {
 // Only count for linear rep.
 // Assuming Z axis control that direction, and is pointing downwards.
 void count_check(float accelZ){
-  if(accelZ < -3){
+  if(accelZ < -2){
     start_pos = true;
-  }else if(start_pos == true && accelZ > 3){
+  }else if(start_pos == true && accelZ > 2){
     start_pos = false;
     count++;
     MyBlue.println("T");
-    Serial.println("T");
+    Serial.println((String)count + "T");
     countDetect = true;
   }
 }
@@ -120,6 +120,7 @@ bool workoutEndChecker(){
     endTime = millis();
     if((endTime - startTime)/1000 > timeoutNumber){
       checkTrigger= false;
+      count = 0;
       MyBlue.println("C");
       Serial.println("C");
       return true;
